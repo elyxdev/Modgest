@@ -2,12 +2,11 @@
 # Aceptar cli
 # Tal vez añadir curseforge
 # Librerías
+import requests, time, argparse, json
 from mod_utils import *
-import requests, time
-import json
 
 # Variables globales (Sin config)
-config = {}
+config = {"user_version": "1.20.1", "loader": "forge", "mod_type": "any"}
 working_directory = os.getcwd()
 config_file_route = os.path.join(working_directory, "modgest_config.json")
 modgest_version = "1.0"
@@ -41,9 +40,6 @@ def reload_config(save=False):
     mod_type = config["mod_type"] # server | client | any 
     loader = config["loader"] # forge | neoforge | fabric
 
-if __name__ == "__main__":
-    reload_config()
-
 def modgest_config(key:str, val:str):
     config[key] = val
     reload_config(save=True)
@@ -51,7 +47,7 @@ def modgest_config(key:str, val:str):
 #### MODRINTH
 
 def ask_modrinth(mod_name = "", itering=False): # Descargar un mod de Modrinth
-    if __name__ == "__main__":
+    if __name__ == "__main__" and itering == False:
         cls()
     if mod_name == "":
         return
@@ -59,7 +55,7 @@ def ask_modrinth(mod_name = "", itering=False): # Descargar un mod de Modrinth
     hits = modrinth_process(mod_data)
     if hits == None:
         return None
-    for mod in hits:
+    for mod in hits[::-1]:
         header = f"[{mod['show_mod_id']}] {mod['name']}"
         data_t = remake_string(f"{mod["description"]}")
         make_table(data_t, table_header=header, show=True)
@@ -69,9 +65,10 @@ def ask_modrinth(mod_name = "", itering=False): # Descargar un mod de Modrinth
         print()
     if __name__ == "__main__":
         if not itering:
-            tololoi = winput("Select a mod > ", torep=1)
-            if not tololoi.isdigit():
-                return
+            tololoi = winput("Select a mod > ", torep="RETRN")
+            if tololoi != 1:
+                if not tololoi.isdigit():
+                    return
         else:
             tololoi = 1
         
@@ -182,6 +179,14 @@ def visual_main(): # Función visual principal
         elif opt == 2:
             cls()
             modrinth_from_file(winput("Enter the path of the file: "))
+        elif opt == 3:
+            cls()
+            modgest_config("user_version", winput("Enter your game version > "))
+            modgest_config("mod_type", winput("Search mods for (client/server/any) > ").lower())
+            modgest_config("loader", winput("Enter your modloader (forge/fabric/neoforge) > ").lower())
+            reload_config()
+            jilog("Options changed successfully.")
+            time.sleep(3)
         elif opt == 4:
             os._exit(0)
         else:
@@ -190,11 +195,48 @@ def visual_main(): # Función visual principal
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Use the Modrinth API to download mods faster.')
+    # Descarga switch
+    parser.add_argument('-d', action='store_true', help='Download a mod')
+    # Especificar modname
+    parser.add_argument('--name', type=str, help='The mod name to download')
+    # Especificar filename
+    parser.add_argument('--filename', type=str, help='The filename to extract mods names') 
+    # Especificar mirror
+    parser.add_argument('--mirror', type=str, help='download from modrinth/curseforge/any')
+    
+    # Config switch
+    parser.add_argument('-c', action='store_true', help='Edit configuration file')
+    # Especificar key
+    parser.add_argument('--key', type=str, help='The key to config')
+    # Especificar value
+    parser.add_argument('--value', type=str, help='The value to config')
+
+    args = parser.parse_args()
+    if args.c == True: # Sí config
+        if args.key == None or args.value == None: # Si ambos están vacíos
+            os._exit(0)
+        modgest_config(args.key, args.value)
+        jilog("Configuration updated successfully.")
+        os._exit(0)
+
+    if args.d == True: # Sí download
+        reload_config()
+        if args.name == None and args.filename == None: # Si ambos están vacíos
+            os._exit(0)
+        if args.name != None:
+            ask_modrinth(args.name,itering=True)
+        if args.filename != None:
+            modrinth_from_file(args.filename)
+        os._exit(0)
+    # Non-CLI
+    reload_config()
     cls()
     jilog(f"ModGest {modgest_version}: Loaded")
     jilog(f"Modloader: {loader.capitalize()}")
     jilog(f"Mod type: {mod_type.capitalize()}")
     jilog(f"MC Version: {user_version}")
+    
     time.sleep(1)
     while True:
         visual_main()
