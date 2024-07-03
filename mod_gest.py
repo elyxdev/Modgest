@@ -1,5 +1,3 @@
-# Traducir al español
-# Aceptar cli
 # Tal vez añadir curseforge
 # Librerías
 import requests, time, argparse, json
