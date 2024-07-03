@@ -55,7 +55,7 @@ def ask_modrinth(mod_name = "", itering=False): # Descargar un mod de Modrinth
         return None
     for mod in hits[::-1]:
         header = f"[{mod['show_mod_id']}] {mod['name']}"
-        data_t = remake_string(f"{mod["description"]}")
+        data_t = remake_string(f"{mod['description']}")
         make_table(data_t, table_header=header, show=True)
     if __name__ == "__main__":
         if not itering:

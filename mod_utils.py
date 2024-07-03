@@ -43,12 +43,12 @@ def make_table(table_data: list, table_header="", show=False):
         if type(table_header) == type([]):
             for line in table_header:
                     if show:
-                        print(f"{ca_main}║{Fore.RESET} {line} {" " * (current_length - len(line) -1 )} {ca_main}║")
+                        print(f"{ca_main}║{Fore.RESET} {line} {' ' * (current_length - len(line) -1 )} {ca_main}║")
         else:
             if show:
-                print(f"{ca_main}║{Fore.RESET} {table_header} {" " * (current_length - len(table_header) -1 )} {ca_main}║")
+                print(f"{ca_main}║{Fore.RESET} {table_header} {' ' * (current_length - len(table_header) -1 )} {ca_main}║")
         if show:
-            print(f"{ca_main}╠{"═" * (current_length+2)}╣{Fore.RESET}")
+            print(f"{ca_main}╠{'═' * (current_length+2)}╣{Fore.RESET}")
     for line in lines:
         if line.strip() == "":
             continue
