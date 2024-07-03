@@ -36,3 +36,18 @@ If the configuration is ready, now you can download your mods.
   --filename FILENAME  The filename to extract mods names
   --mirror MIRROR      download from modrinth/curseforge/any
 ```
+# As library
+If you want to use Modgest in your Python code, you must import this functions.
+```python
+from mod_gest import modgest_config, reload_config, ask_modrinth
+```
+Example of usage:
+```python
+from mod_gest import modgest_config, reload_config, ask_modrinth, modrinth_from_file
+modgest_config("user_version", "1.20.1")
+modgest_config("mod_type", "client") # Only for client-sided mods
+modgest_config("loader", "fabric")
+reload_config() # Must be used after using modgest_config()
+ask_modrinth("sodium") # Downloads sodium for Fabric 1.20.1
+modrinth_from_file("modlist.txt") # Downloads mods contained in modlist.txt for Fabric 1.20.1
+```
