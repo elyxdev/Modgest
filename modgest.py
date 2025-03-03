@@ -274,6 +274,8 @@ if __name__ == "__main__":
     parser.add_argument('--value', type=str, help='Valor configurado')
 
     args = parser.parse_args()
+    if os.name == "nt":
+        os.system(f"title Modgest {modgest_version}")
     if args.c == True: # Sí config
         if args.key == None or args.value == None: # Si ambos están vacíos
             os._exit(0)
