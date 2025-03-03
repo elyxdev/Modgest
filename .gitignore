@@ -2,6 +2,7 @@
 *.txt
 *.spec
 *.json
+*.jar
 test*
 build/
 dist/

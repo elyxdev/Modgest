@@ -1,53 +1,52 @@
 # Modgest
-Modgest is a mod manager that uses the Modrinth API to download one or multiple mods according to the specified version and modloader. The benefit of this is its speed and CLI support. Being able to download mods with just the name in seconds. Allows you to specify if you want mods for client, server or both.
+Modgest es un administrador de mods que utiliza la API de Modrinth para descargar uno o varios mods según la versión y el modloader especificados. El beneficio de esto es su velocidad y compatibilidad con CLI. Pudiendo descargar mods con solo el nombre en cuestión segundos. Le permite especificar si desea mods para el cliente, el servidor o ambos.
 
-# Usage
-- Download the latest release and run it for your operating system.
-- It will ask you for the initial data, the use is quite intuitive and easy. 
-You can make a text file containing the name of the desired mods
-Example (modlist.txt): 
-```
+# Modo de uso
+- Descargue la última versión y ejecútela para su sistema operativo.
+- Te pedirá los datos iniciales, el uso es bastante intuitivo y fácil.
+Puedes crear un archivo de texto que contenga el nombre de los mods deseados.
+Ejemplo (modlist.txt): 
+```txt
 securitycraft
 canary
 nuclearcraft
 ```
-You can use the slug or project id to download a specific mod (Downloading one or more mods).
-**(Note: If you have a folder named "mods", the downloaded mods will be there. Useful to put Modgest in your server root directory)**
+Puedes usar el slug o la identificación del proyecto para descargar un mod específico (Descargar uno o más mods).
+**(Nota: si tiene una carpeta llamada "mods", los mods descargados estarán allí. Es útil colocar Modgest en el directorio raíz de su servidor)**
 
 # CLI
-If you want to integrate this project with another using the executable, you can use the CLI arguments.
-To view the CLI help from the terminal you can use this command
+Si desea integrar este proyecto con otro usando el ejecutable, puede usar los argumentos CLI.
+Para ver la ayuda CLI desde la terminal, puede usar este comando
 ```
 $ modgest -h
 ```
-This will show you the available arguments.
-If the `modgest_config.json` file isn't already created or configurated you must configure it from the CLI
-> Configuring from the CLI
+Esto le mostrará los argumentos disponibles en este proyecto con otro usando el ejecutable, puede usar los argumentos CLI.
+Si el archivo `modgest_config.json` aún no está creado o configurado, debe configurarlo desde la CLI
+> Configurar desde la CLI
 ```
-  -c                   Edit configuration file
-  --key KEY            The key to config (user_version/loader/mod_type)
-  --value VALUE        The value to config
+  -c                     Configurar
+  --key <llave>          Valor a configurar
+  --value <valor>        Valor configurado
 ```
-If the configuration is ready, now you can download your mods.
-> Downloading from the CLI
+Si la configuración está lista, ahora puedes descargar tus mods.
+> Descarga desde la CLI
 ```
-  -d                   Download a mod
-  --name NAME          The mod name to download
-  --filename FILENAME  The filename to extract mods names
-  --mirror MIRROR      download from modrinth/curseforge/any
+  -d                   Descarga un mod
+  --name NAME          El nombre del mod a descargar (Un solo mod)
+  --filename FILENAME  El nombre del archivo que contiene los nombres de mods (Varios mods)
 ```
 # As library
-If you want to use Modgest in your Python code, you must import this functions.
+Si desea utilizar Modgest en su código Python, debe importar estas funciones.
 ```python
-from mod_gest import modgest_config, reload_config, ask_modrinth
+from modgest import modgest_config, reload_config, ask_modrinth
 ```
-Example of usage:
+Ejemplo de uso:
 ```python
-from mod_gest import modgest_config, reload_config, ask_modrinth, modrinth_from_file
+from modgest import modgest_config, reload_config, ask_modrinth, modrinth_from_file
 modgest_config("user_version", "1.20.1")
-modgest_config("mod_type", "client") # Only for client-sided mods
+modgest_config("mod_type", "client") # Sólo para mods del lado del cliente
 modgest_config("loader", "fabric")
-reload_config() # Must be used after using modgest_config()
-ask_modrinth("sodium") # Downloads sodium for Fabric 1.20.1
-modrinth_from_file("modlist.txt") # Downloads mods contained in modlist.txt for Fabric 1.20.1
+reload_config() # Debe usarse después de usar modgest_config()
+ask_modrinth("sodium") # Descarga sodium para Fabric 1.20.1
+modrinth_from_file("modlist.txt") # Descargas mods contenidos en modlist.txt para Fabric 1.20.1
 ```

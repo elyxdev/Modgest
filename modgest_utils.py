@@ -3,14 +3,14 @@ from colorama import Fore
 import os
 
 ca_main = Fore.LIGHTGREEN_EX
-defcol = Colors.cyan_to_green # Main color
+defcol = Colors.blue_to_purple # Main color
 
 def jilog(text:str):
-    Write.Print(text, defcol, 0.009)
+    Write.Print(text, defcol, 0.005)
     print()
 
 def winput(text="", torep=""):
-    sarna = Write.Input(text, defcol, 0.009)
+    sarna = Write.Input(text, defcol, 0.005)
     if sarna == "":
         return torep
     else:
