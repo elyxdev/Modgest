@@ -7,7 +7,7 @@ from glob import glob
 config = {"user_version": "1.20.1", "loader": "forge", "mod_type": "ambos"}
 working_directory = os.getcwd()
 config_file_route = os.path.join(working_directory, "modgest_config.json")
-modgest_version = "1.1"
+modgest_version = "1.2"
 timeout_rate = 2
 user_version = ""
 mod_type = ""
