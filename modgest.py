@@ -1,6 +1,7 @@
 import requests, time, argparse, json
+from urllib.parse import unquote
 from modgest_utils import *
-from tqdm import tqdm
+from glob import glob
 
 # Variables globales (Sin config)
 config = {"user_version": "1.20.1", "loader": "forge", "mod_type": "ambos"}
@@ -153,39 +154,36 @@ def get_modrinth(slug : str): # Obtener y descargar mediante id/slug
     mod = requests.get(api_files_route).json()
     
     mod = mod[0] # Actualización más reciente
+    file_name = mod["files"][0]["filename"]
 
     # Descargar las dependencias
     if len(mod["dependencies"]) > 0:
-        jilog("Descargando dependencias...")
+        jilog(f"Descargando dependencias de {file_name}")
         for dependency in mod["dependencies"]:
+            if dependency["dependency_type"] == 'optional':
+                continue
             jilog(get_modrinth(dependency["project_id"]))
 
     # Descarga el mod
     file_url = mod["files"][0]["url"]
-    file_name = mod["files"][0]["filename"]
-    if os.path.exists(os.path.join(working_directory, "mods/")):
-        file_path = os.path.join(working_directory, "mods", file_name)
-    else:
-        file_path = os.path.join(working_directory)
     
-    respuesta = requests.get(file_url, stream=True)
-    total = int(respuesta.headers.get('content-length', 0))
+    if not os.path.exists(os.path.join(working_directory, "mods/")):
+        os.mkdir(os.path.join(working_directory, "mods"))
+    file_path = os.path.join(working_directory, "mods", file_name)
+    
+    nombre = unquote(file_url.split('/')[-1])
+    contenidos = glob(f"{os.path.join(working_directory, "mods")}{os.sep}*.*")
+    found = any(nombre in path for path in contenidos)
 
-    with open(file_path, "wb") as f, tqdm(
-        desc=file_name,
-        total=total,
-        unit="B",
-        unit_scale=True,
-        unit_divisor=1024,
-        miniters=1,
-    ) as barra:
-        for datos in respuesta.iter_content(chunk_size=1024):
-            if datos:
-                f.write(datos)
-                barra.update(len(datos))  # Actualizar barra en MB
-                barra.refresh()
+    if found:
+        return f"Mod ya existente: {nombre}"
+    else:
+        respuesta = requests.get(file_url, stream=True).content
 
-    return f"{file_name} descargado en {file_path}" 
+        with open(file_path, "wb") as f:
+            f.write(respuesta)
+
+        return f"{file_name} descargado!" 
 
 def modrinth_from_file(filename:str, precise=False): # Descargar con un archivo
     if not os.path.exists(filename):
