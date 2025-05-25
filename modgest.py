@@ -7,7 +7,7 @@ from glob import glob
 config = {"user_version": "1.20.1", "loader": "forge", "mod_type": "ambos"}
 working_directory = os.getcwd()
 config_file_route = os.path.join(working_directory, "modgest_config.json")
-modgest_version = "1.2"
+modgest_version = "1.3"
 timeout_rate = 2
 user_version = ""
 mod_type = ""
@@ -156,14 +156,6 @@ def get_modrinth(slug : str): # Obtener y descargar mediante id/slug
     mod = mod[0] # Actualización más reciente
     file_name = mod["files"][0]["filename"]
 
-    # Descargar las dependencias
-    if len(mod["dependencies"]) > 0:
-        jilog(f"Descargando dependencias de {file_name}")
-        for dependency in mod["dependencies"]:
-            if dependency["dependency_type"] == 'optional':
-                continue
-            jilog(get_modrinth(dependency["project_id"]))
-
     # Descarga el mod
     file_url = mod["files"][0]["url"]
     
@@ -183,7 +175,15 @@ def get_modrinth(slug : str): # Obtener y descargar mediante id/slug
         with open(file_path, "wb") as f:
             f.write(respuesta)
 
-        return f"{file_name} descargado!" 
+    # Descargar las dependencias
+    if len(mod["dependencies"]) > 0:
+        jilog(f"Descargando dependencias de {file_name}")
+        for dependency in mod["dependencies"]:
+            if dependency["dependency_type"] == 'optional':
+                continue
+            jilog(get_modrinth(dependency["project_id"]))
+
+    return f"{file_name} descargado!" 
 
 def modrinth_from_file(filename:str, precise=False): # Descargar con un archivo
     if not os.path.exists(filename):
