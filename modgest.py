@@ -7,7 +7,7 @@ from glob import glob
 config = {"user_version": "1.20.1", "loader": "forge", "mod_type": "ambos"}
 working_directory = os.getcwd()
 config_file_route = os.path.join(working_directory, "modgest_config.json")
-modgest_version = "1.3"
+modgest_version = "1.3.2"
 timeout_rate = 2
 user_version = ""
 mod_type = ""
@@ -52,7 +52,7 @@ def ask_modrinth(mod_name = "", itering=False): # Descargar un mod de Modrinth
     if mod_name == "":
         return
     hits = search_modrinth(mod_name)
-    if hits == None:
+    if hits == None or len(hits) < 1:
         return None
     for mod in hits[::-1]:
         header = f"[{mod['show_mod_id']}] {mod['name']}"
@@ -152,6 +152,9 @@ def get_modrinth(slug : str): # Obtener y descargar mediante id/slug
     
     api_files_route = f"https://api.modrinth.com/v2/project/{slug}/version?loaders=[\"{loader}\"]&game_versions=[\"{user_version}\"]" # Ruta API
     mod = requests.get(api_files_route).json()
+    
+    if mod == None or len(mod) < 1:
+        return "Mod no disponible"
     
     mod = mod[0] # Actualización más reciente
     file_name = mod["files"][0]["filename"]
