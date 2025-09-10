@@ -3,7 +3,7 @@ from colorama import Fore
 import os
 
 ca_main = Fore.LIGHTGREEN_EX
-defcol = Colors.blue_to_purple # Main color
+defcol = Colors.white_to_green # Main color
 
 def jilog(text:str):
     Write.Print(text, defcol, 0.005)

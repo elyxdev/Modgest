@@ -7,11 +7,11 @@ from glob import glob
 config = {"user_version": "1.20.1", "loader": "forge", "mod_type": "ambos"}
 working_directory = os.getcwd()
 config_file_route = os.path.join(working_directory, "modgest_config.json")
-modgest_version = "1.3.2"
-timeout_rate = 2
+modgest_version = "1.3.3"
 user_version = ""
 mod_type = ""
 loader = ""
+mf = ""
 
 # Funciones de configuración
 
@@ -81,13 +81,16 @@ def ask_modrinth(mod_name = "", itering=False): # Descargar un mod de Modrinth
     return True
 
 def check_comp(mod_data:object, search_result=False): # Verificar la compatibilidad del mod
-
-    if not search_result:
-        if not user_version in mod_data["game_versions"]:
-            return False
-    else:
-        if not user_version in mod_data["versions"]:
-            return False
+    try:
+        if not search_result:
+            if not user_version in mod_data["game_versions"]:
+                return False
+        else:
+            if not user_version in mod_data["versions"]:
+                return False
+    except Exception as e:
+        jilog(f"Error: {e}")
+        return False
         
     es_cliente = mod_data["client_side"] 
     es_servidor = mod_data["server_side"]
@@ -144,7 +147,7 @@ def search_modrinth(mod_name : str): # Buscar en modrinth
         return None
     return final_hits
 
-def get_modrinth(slug : str): # Obtener y descargar mediante id/slug
+def get_modrinth(slug : str, modfolder = ""): # Obtener y descargar mediante id/slug
     api_base_route = f"https://api.modrinth.com/v2/project/{slug}"
     base = requests.get(api_base_route).json()
     if not check_comp(base):
@@ -161,10 +164,24 @@ def get_modrinth(slug : str): # Obtener y descargar mediante id/slug
 
     # Descarga el mod
     file_url = mod["files"][0]["url"]
-    
-    if not os.path.exists(os.path.join(working_directory, "mods/")):
+
+
+    # Verifica carpeta de mods
+    if not os.path.exists(os.path.join(working_directory, "mods")):
         os.mkdir(os.path.join(working_directory, "mods"))
-    file_path = os.path.join(working_directory, "mods", file_name)
+
+    # Verifica subcarpeta del mod
+    if modfolder != "":
+        file_folder = os.path.join(working_directory, "mods", modfolder)
+    else:
+        file_folder = os.path.join(working_directory, "mods")
+
+    # Crear carpeta correspondiente en caso de que no exista
+    if not os.path.exists(file_folder):
+        os.mkdir(file_folder)
+
+    # Establecer ruta del nuevo archivo
+    file_path = os.path.join(file_folder, file_name)
     
     nombre = unquote(file_url.split('/')[-1])
     contenidos = glob(f"{os.path.join(working_directory, "mods")}{os.sep}*.*")
@@ -184,11 +201,15 @@ def get_modrinth(slug : str): # Obtener y descargar mediante id/slug
         for dependency in mod["dependencies"]:
             if dependency["dependency_type"] == 'optional':
                 continue
-            jilog(get_modrinth(dependency["project_id"]))
+            jilog(get_modrinth(dependency["project_id"], modfolder=modfolder))
 
     return f"{file_name} descargado!" 
 
+
+# Funciones generales
+
 def modrinth_from_file(filename:str, precise=False): # Descargar con un archivo
+    global mf
     if not os.path.exists(filename):
         if not os.path.exists(f"{filename}.txt"):
             print(f"Archivo no encontrado: {filename}")
@@ -199,15 +220,22 @@ def modrinth_from_file(filename:str, precise=False): # Descargar con un archivo
     with open(filename, 'r') as file:
         lines = file.readlines()
         for line in lines:
+            if line.strip() == "":
+                continue
+            if line.startswith("--"):
+                mf = line.replace("-- ", "").strip()
+                continue
             if precise == False:
                 jilog(f"---\nDescargando: {line}")
                 ask_modrinth(line, itering=True)
                 jilog("---")
             else:
                 jilog(f"---\nDescargando: {line}")
-                get_modrinth(line.strip())
+                get_modrinth(line.strip(), modfolder=mf)
                 jilog("---")
-#### Funciones visuales y principales
+    mf = ""
+
+# Funciones visuales y principales
 
 def visual_main(): # Función visual principal
     cls()
